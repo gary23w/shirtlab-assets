@@ -15,12 +15,16 @@ const response = await fetch(url, {
 });
 if (!response.ok) throw new Error(`Assets API returned ${response.status}`);
 const page = await response.json();
-console.log(page.results.map(({ id, label, url, shirtUrl }) => ({ id, label, url, shirtUrl })));
+for (const asset of page.results) console.log(asset.id, asset.label, asset.url, asset.shirtUrl);
 ```
 
 Gateway paths above must match the imported project and its generated snippet. The provider base URL is `https://shirtlab.lol/api/wiki/v1`; it is configured once in the API project, rather than repeated inside endpoint paths.
 
 For direct public browser access, use [the origin API and SDK](https://shirtlab.lol/wiki/api/). Metadata's `downloadUrl`, `previewUrl`, `url` and `shirtUrl` are public Shirt Lab URLs; never attach gateway credentials to those links.
+
+## Free plan and platform limits
+
+The Shirt Lab plan is $0 with no paid tiers or Shirt Lab request overage charges. The gateway currently allows 500,000 requests per month and 1,000 per hour. RapidAPI separately includes 10 GB of bandwidth per billing cycle and may charge consumers $0.001 per additional MB. For artwork downloads, the public `downloadUrl` bypasses gateway bandwidth billing. Direct origin access remains free. See [RapidAPI bandwidth policy](https://docs.rapidapi.com/docs/connecting-to-an-api).
 
 ## Endpoints
 

@@ -18,6 +18,8 @@ The current snapshot contains **439,476 asset representations across 393 packs**
 
 The API origin is public and read-only, with CORS enabled. No additional Shirt Lab API key is required. When using the RapidAPI gateway, use the host and credentials supplied by RapidAPI and check the free plan's current request limits.
 
+The Shirt Lab plan is $0 with no paid tiers or Shirt Lab request overage charges. The gateway currently allows 500,000 requests per month and 1,000 per hour. RapidAPI separately includes 10 GB of bandwidth per billing cycle and may charge consumers $0.001 per additional MB. For artwork downloads, the public `downloadUrl` bypasses gateway bandwidth billing. Direct origin access remains free. See [RapidAPI bandwidth policy](https://docs.rapidapi.com/docs/connecting-to-an-api).
+
 ## Artwork licences
 
 Free API access does not replace the artists' terms. Read `license`, `licenseUrl` and any per-asset `terms` before using artwork. Some licences require attribution or have other conditions. The original library code and SDK are MIT-licensed; the artwork retains its individual licences.

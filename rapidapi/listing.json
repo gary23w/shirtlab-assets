@@ -1,12 +1,24 @@
 {
   "name": "Shirt Lab Free Icons & Game Assets",
   "shortDescription": "Search and download SVG icons, native PNG artwork, pixel art and game assets. Creator licences, Wiki pages and shirt designer links included.",
-  "categoryPreference": "Video and Images",
-  "tags": ["icons", "svg", "png", "pixel art", "game assets", "free assets", "design", "t-shirts"],
+  "categoryPreference": "Video, Images",
+  "tags": [
+    "icons",
+    "svg",
+    "png",
+    "pixel art",
+    "game assets",
+    "free assets",
+    "design",
+    "t-shirts"
+  ],
   "website": "https://shirtlab.lol/wiki/",
   "baseUrl": "https://shirtlab.lol/api/wiki/v1",
   "healthCheck": "/manifest",
   "logo": "https://shirtlab.lol/icon-192.png",
-  "pricingIntent": "Free BASIC only, price 0, no paid tiers and no billable overages. Verify actual gateway limits and public free badge before publication.",
-  "termsOfUse": "API access is free. Each asset retains its original creator licence. Check license, licenseUrl and any per-asset terms before reuse; preserve required attribution. The SDK and original catalogue tooling are MIT-licensed; this does not relicense artwork."
+  "pricingIntent": "Free BASIC only, price 0, 500,000 requests/month, 1,000/hour. No paid tiers or Shirt Lab request overages. RapidAPI’s separate platform bandwidth fee above 10 GB cannot be edited in the provider plan UI; disclose it and offer public downloadUrl for artwork.",
+  "termsOfUse": "API access is free. Each asset retains its original creator licence. Check license, licenseUrl and any per-asset terms before reuse; preserve required attribution. The SDK and original catalogue tooling are MIT-licensed; this does not relicense artwork. RapidAPI gateway limits and its separate platform bandwidth fees apply; direct public origin access remains free.",
+  "gatewayHost": "shirt-lab-free-icons-game-assets.p.rapidapi.com",
+  "listingUrl": "https://rapidapi.com/lfbuildersmanager/api/shirt-lab-free-icons-game-assets",
+  "publicationStatus": "private-draft"
 }

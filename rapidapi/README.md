@@ -4,7 +4,7 @@ Import `openapi.json` into a private API project. It targets OpenAPI 3.0.3 while
 
 Use `listing.json` for provider fields, `overview.md` for the long description and `docs.md` for the About/readme. The current Shirt Lab logo is [icon-192.png](https://shirtlab.lol/icon-192.png), within the Hub's 500 × 500 size limit.
 
-Set the upstream base URL to `https://shirtlab.lol/api/wiki/v1`, and use `/manifest` as the health check. Configure free BASIC only, with price zero and no billable overages. Verify the actual marketplace free label and quota in the current UI.
+Set the upstream base URL to `https://shirtlab.lol/api/wiki/v1`, and use `/manifest` as the health check. Configure free BASIC only with price zero and no Shirt Lab request overages. The current UI provides 500,000 requests per month; set 1,000 requests per hour. RapidAPI separately charges consumers a platform bandwidth fee above 10 GB, which is not editable in the provider plan UI. Disclose this clearly, and offer direct public download URLs for artwork. Verify the actual marketplace free label and quota before publication.
 
 Run `node rapidapi/verify.mjs` before publication. It saves a bounded readiness receipt to a supplied path (`--report=...`) or prints a summary. By default it verifies the public origin. To test an actual gateway, set `RAPIDAPI_HOST` and `RAPIDAPI_KEY` in the environment and use `--gateway`; it does not print or save credentials. Do not put the key in a command argument, a repository file or public browser code.
 

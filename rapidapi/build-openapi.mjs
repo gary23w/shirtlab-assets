@@ -86,8 +86,6 @@ const descriptions = {
 for (const parameter of search.parameters) {
   parameter.description = descriptions[parameter.name];
   if (parameter.name === 'q') parameter.example = 'controller';
-  if (parameter.name === 'pack') parameter.example = 'lucide';
-  if (parameter.name === 'license') parameter.example = 'CC0-1.0';
 }
 const detail = describe('/assets/{id}', 'Assets', 'Get asset details and Shirt Lab links', 'Includes downloadUrl, previewUrl, creator licence, canonical Wiki url and shirtUrl. A shirtUrl opens Studio with the asset search selected; adding artwork is a user action.', 'Asset');
 detail.parameters = [idParameter, versionParameter];
@@ -110,5 +108,8 @@ for (const path of Object.values(spec.paths)) for (const operation of Object.val
   if (operation.responses['409']) operation.responses['409'].description = 'Snapshot changed. Refresh /manifest and restart pagination.';
   if (operation.responses['503']) operation.responses['503'].description = 'The catalogue or source file is temporarily unavailable. Retry later.';
 }
+const responseExamples = JSON.parse(await readFile(new URL('./response-examples.json', import.meta.url), 'utf8'));
+for (const [route, sample] of Object.entries(responseExamples)) spec.paths[route].get.responses['200'].content['application/json'].example = sample;
+for (const operation of Object.values(spec.paths).map(path => path.get)) operation.externalDocs = spec.externalDocs;
 await writeFile(new URL('./openapi.json', import.meta.url), JSON.stringify(spec, null, 2) + '\n');
 console.log(JSON.stringify({ openapi: spec.openapi, endpoints: Object.keys(spec.paths).length, baseUrl: spec.servers[0].url }));
