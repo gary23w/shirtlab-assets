@@ -1,0 +1,988 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Shirt Lab Free Icons & Game Assets",
+    "version": "1.0.0",
+    "description": "Search SVG icons, native PNG artwork, pixel art and game assets. Metadata includes creator licences, source downloads, a canonical Shirt Lab Wiki page and a link to find the asset in the shirt designer. Free access; artwork retains its individual creator licence. RapidAPI supplies its own gateway credentials; no additional Shirt Lab API key is needed.",
+    "contact": {
+      "name": "Shirt Lab Assets",
+      "url": "https://shirtlab.lol/wiki/"
+    },
+    "license": {
+      "name": "MIT (original library code only; artwork has individual licences)",
+      "url": "https://github.com/gary23w/shirtlab-assets/blob/main/LICENSE"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://shirtlab.lol/api/wiki/v1",
+      "description": "Live, public Shirt Lab Assets API"
+    }
+  ],
+  "paths": {
+    "/manifest": {
+      "get": {
+        "operationId": "manifest",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Manifest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query or unavailable format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot changed. Refresh /manifest and restart pagination.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The catalogue or source file is temporarily unavailable. Retry later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Catalogue"
+        ],
+        "summary": "Get the library version and capabilities",
+        "description": "Use this lightweight endpoint as the health check. Counts represent downloadable asset representations, including style variants. Fetch version before a paginated collection export."
+      }
+    },
+    "/packs": {
+      "get": {
+        "operationId": "packs",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Packs"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query or unavailable format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot changed. Refresh /manifest and restart pagination.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The catalogue or source file is temporarily unavailable. Retry later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Catalogue"
+        ],
+        "summary": "Browse creator packs and licences",
+        "description": "Discover pack prefixes for search filters, creator credits and licence notices. Each pack includes a canonical Wiki link."
+      }
+    },
+    "/assets": {
+      "get": {
+        "operationId": "searchAssets",
+        "summary": "Search free icons, pixel art and game assets",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "description": "Up to 160 characters and eight meaningful words. An empty query browses the catalogue.",
+            "example": "controller"
+          },
+          {
+            "name": "pack",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Exact prefix from /packs, for example lucide. Unknown prefixes return 400.",
+            "example": "lucide"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "svg",
+                "png"
+              ]
+            },
+            "description": "Native downloadable source format, SVG or PNG. This is not a rasterization request."
+          },
+          {
+            "name": "license",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Exact identifier from manifest.licenses, for example CC0-1.0. This filters individual asset licences.",
+            "example": "CC0-1.0"
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional snapshot version from /manifest. A stale version returns 409."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60,
+              "default": 48
+            },
+            "description": "Page size: 1–60, default 48."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Zero-based result offset. Use nextOffset from the previous page."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query or unavailable format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot changed. Refresh /manifest and restart pagination.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The catalogue or source file is temporarily unavailable. Retry later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Assets"
+        ],
+        "description": "Search uses all meaningful words and common plural forms across names, aliases, categories, packs and creators. Filter by pack, source format or licence. Follow nextOffset and pin version to build a collection."
+      }
+    },
+    "/assets/{id}": {
+      "get": {
+        "operationId": "getAsset",
+        "summary": "Get asset details and Shirt Lab links",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Pack prefix and asset name separated by a colon. Percent-encode the complete ID when building a URL.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+:[a-z0-9-]+$",
+              "maxLength": 240
+            },
+            "example": "lucide:gamepad-2"
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "Optional snapshot version from /manifest. A stale version returns 409.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Asset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query or unavailable format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot changed. Refresh /manifest and restart pagination.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The catalogue or source file is temporarily unavailable. Retry later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Assets"
+        ],
+        "description": "Includes downloadUrl, previewUrl, creator licence, canonical Wiki url and shirtUrl. A shirtUrl opens Studio with the asset search selected; adding artwork is a user action."
+      }
+    },
+    "/assets/{id}/download": {
+      "get": {
+        "operationId": "downloadAsset",
+        "summary": "Download SVG or original PNG artwork",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Pack prefix and asset name separated by a colon. Percent-encode the complete ID when building a URL.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+:[a-z0-9-]+$",
+              "maxLength": 240
+            },
+            "example": "lucide:gamepad-2"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Choose source, SVG, or native PNG.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "source",
+                "svg",
+                "png"
+              ],
+              "default": "source"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "Optional snapshot version from /manifest. A stale version returns 409.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Source artwork, served as an attachment.",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Attachment with a pack and asset filename."
+              },
+              "X-Asset-SHA256": {
+                "description": "SHA-256 digest of the exact response bytes.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query or unavailable format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot changed. Refresh /manifest and restart pagination.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The catalogue or source file is temporarily unavailable. Retry later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Assets"
+        ],
+        "description": "Default format=source returns SVG geometry or native PNG bytes. format=svg is also available for PNG assets as an SVG wrapper. format=png works only for native PNG assets; SVG-to-PNG conversion is not offered. Preserve each creator licence. Verify bytes with X-Asset-SHA256."
+      }
+    },
+    "/assets/{id}/preview.svg": {
+      "get": {
+        "operationId": "previewAsset",
+        "tags": [
+          "Assets"
+        ],
+        "summary": "Preview an asset as SVG",
+        "description": "Inline SVG preview. Native PNG artwork remains embedded at its original resolution. For a lighter display preview, prefer the metadata previewUrl when provided.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Pack prefix and asset name separated by a colon. Percent-encode the complete ID when building a URL.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+:[a-z0-9-]+$",
+              "maxLength": 240
+            },
+            "example": "lucide:gamepad-2"
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "Optional snapshot version from /manifest. A stale version returns 409.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inline SVG preview.",
+            "headers": {
+              "X-Asset-SHA256": {
+                "description": "SHA-256 digest of the exact response bytes.",
+                "schema": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query or unavailable format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Snapshot changed. Refresh /manifest and restart pagination.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The catalogue or source file is temporarily unavailable. Retry later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "Asset": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "label",
+          "pack",
+          "format",
+          "editable",
+          "license",
+          "licenseUrl",
+          "licenseSha256",
+          "url",
+          "shirtUrl",
+          "downloadUrl",
+          "svgUrl",
+          "previewUrl",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+:[a-z0-9-]+$",
+            "maxLength": 240,
+            "example": "lucide:gamepad-2"
+          },
+          "name": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "pack": {
+            "$ref": "#/components/schemas/Pack"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "svg",
+              "png"
+            ]
+          },
+          "editable": {
+            "type": "string",
+            "enum": [
+              "vector",
+              "image"
+            ]
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "aliases": {
+            "type": "string"
+          },
+          "license": {
+            "$ref": "#/components/schemas/License"
+          },
+          "licenseUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Original creator notice; preserve required attribution."
+          },
+          "licenseSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "terms": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "source": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Canonical Wiki page. Link here for asset details, downloads and creator credits."
+          },
+          "shirtUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Open Shirt Lab Studio with this pack and asset search selected."
+          },
+          "downloadUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Direct public download URL. No gateway credentials are needed at this URL."
+          },
+          "svgUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "SVG source, or SVG wrapper containing the original PNG for raster artwork."
+          },
+          "previewUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Display preview URL, which can be SVG or PNG."
+          },
+          "version": {
+            "type": "string",
+            "description": "Pin this snapshot during pagination."
+          }
+        }
+      },
+      "SearchPage": {
+        "type": "object",
+        "required": [
+          "version",
+          "total",
+          "results",
+          "nextOffset"
+        ],
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "nextOffset": {
+            "type": "integer",
+            "nullable": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Asset"
+            }
+          }
+        }
+      },
+      "Collection": {
+        "type": "object",
+        "required": [
+          "schema",
+          "name",
+          "assets"
+        ],
+        "properties": {
+          "schema": {
+            "enum": [
+              "shirtlab.collection.v1"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "assets": {
+            "type": "array",
+            "maxItems": 2000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+:[a-z0-9-]+$"
+            }
+          }
+        }
+      },
+      "License": {
+        "type": "object",
+        "required": [
+          "title",
+          "spdx"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "spdx": {
+            "type": "string",
+            "description": "Creator licence identifier. Read the linked notice before reuse."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "Pack": {
+        "type": "object",
+        "required": [
+          "prefix",
+          "name",
+          "count",
+          "author",
+          "license",
+          "licenseUrl",
+          "licenseSha256",
+          "url"
+        ],
+        "properties": {
+          "prefix": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "author": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "license": {
+            "$ref": "#/components/schemas/License"
+          },
+          "licenseUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Complete creator notice hosted by Shirt Lab."
+          },
+          "licenseSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "source": {
+            "type": "string",
+            "format": "uri"
+          },
+          "vectorCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "rasterCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Browse this creator pack in the Shirt Lab Wiki."
+          }
+        }
+      },
+      "Packs": {
+        "type": "object",
+        "required": [
+          "version",
+          "results"
+        ],
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Pack"
+            }
+          }
+        }
+      },
+      "Manifest": {
+        "type": "object",
+        "required": [
+          "schema",
+          "version",
+          "count",
+          "packCount",
+          "formats",
+          "licenses",
+          "search",
+          "dataset",
+          "datasetSha256",
+          "catalogueSha256",
+          "openapi",
+          "source"
+        ],
+        "properties": {
+          "schema": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "packCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "formats": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "svg",
+                "png"
+              ]
+            }
+          },
+          "licenses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "search": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string"
+              },
+              "maximumQueryLength": {
+                "type": "integer"
+              },
+              "maximumWords": {
+                "type": "integer"
+              },
+              "stopWords": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "pluralForms": {
+                "type": "boolean"
+              }
+            }
+          },
+          "dataset": {
+            "type": "string",
+            "format": "uri"
+          },
+          "datasetSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "catalogueSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "openapi": {
+            "type": "string",
+            "format": "uri"
+          },
+          "source": {
+            "type": "string",
+            "format": "uri",
+            "description": "Open-source SDK and catalogue tooling."
+          }
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Shirt Lab Wiki API documentation, downloads and collections",
+    "url": "https://shirtlab.lol/wiki/api/"
+  },
+  "tags": [
+    {
+      "name": "Catalogue",
+      "description": "Current dataset version and creator packs."
+    },
+    {
+      "name": "Assets",
+      "description": "Search, metadata, previews and source downloads."
+    }
+  ]
+}

@@ -24,6 +24,10 @@ See [API documentation](https://shirtlab.lol/wiki/api/) and [OpenAPI 3.1](https:
 
 Search uses all words, common plural forms, and asset aliases, categories, pack names and creators. Filter by `pack`, `format` and `license`. Requests return up to 60 items. Continue with `nextOffset`; pin the returned `version`. A changed version returns 409. Download responses carry a SHA-256 header and ETag. PNG sources preserve embedded PNG bytes; SVG downloads preserve the catalogue representation, including source-view bounds where present.
 
+## RapidAPI integration
+
+The [RapidAPI integration package](rapidapi/) includes an OpenAPI 3.0.3 import, endpoint documentation, a server-side gateway client and an accessible card recipe with creator credits, downloads, Wiki links and Shirt Lab Studio links. Gateway hosts and credentials come from the actual marketplace project; the direct public SDK above does not require them.
+
 ## Collections
 
 The wiki stores named collections in browser local storage. Export JSON for portability:
