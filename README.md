@@ -65,6 +65,14 @@ The mirror checks SHA-256 and byte counts, uses four concurrent requests and ref
 
 `service.mjs` exports `freeAssetsRoute(request, assetsBinding, config)`. The assets binding implements `fetch(Request)` and serves the mirrored catalogue, generated dataset, and browser modules. Config contains `manifestPath`, `manifestBytes`, `manifestSha256`, and `repository`. The service supports GET, HEAD and CORS OPTIONS, server-rendered wiki pages and a documented API. Host `app.mjs`, `sdk.mjs`, `library.css` and `vendor/fflate.mjs` under `/wiki/`. Adjust the canonical origin and API URLs for your own domain. Source sitemap files use at most 45,000 asset URLs each.
 
+To render the root and first pack pages from an existing asset host directory:
+
+```sh
+node build-site.mjs ./host-assets ./static-pages ./build/preparation.json
+```
+
+The renderer uses the same service and dataset as the live API. Keep the generated browser modules and artwork resources alongside the pages.
+
 ## Licences
 
 Original library code is MIT licensed. **Artwork is not relicensed under MIT.** Each asset retains its creator's licence, attribution, declarations and any applicable brand guidelines. Mixed-licence packs include per-asset overrides. Notices are linked from every asset and included in collection downloads. Trademarks remain with their owners. Vendored fflate has its own MIT notice in `vendor/fflate-LICENSE.txt`.
