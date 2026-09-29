@@ -3,7 +3,7 @@ import fs from 'node:fs';import path from 'node:path';import {createHash} from '
 import {words,shard,hex} from './index-format.mjs';
 const root=process.cwd(),source=path.resolve(process.argv[2]||'download'),out=path.resolve(process.argv[3]||'build');
 assert.equal(fs.existsSync(out),false);fs.mkdirSync(out,{recursive:true});
-const sha=bytes=>createHash('sha256').update(bytes).digest('hex'),manifestBytes=fs.readFileSync(source+'/icon-catalogue/manifest.json'),catalogue=JSON.parse(manifestBytes),catalogueSha256=sha(manifestBytes),version='v1-'+sha(Buffer.from(JSON.stringify({catalogueSha256,builder:sha(fs.readFileSync(import.meta.filename)),notices:catalogue.packs.map(p=>sha(fs.readFileSync(source+p.licencePath))),previews:'none'}))).slice(0,20),dataRoot='/wiki/data/'+version;
+const sha=bytes=>createHash('sha256').update(bytes).digest('hex'),manifestBytes=fs.readFileSync(source+'/icon-catalogue/manifest.json'),catalogue=JSON.parse(manifestBytes),catalogueSha256=sha(manifestBytes),version='v1-'+sha(Buffer.from(JSON.stringify({catalogueSha256,builder:sha(fs.readFileSync(import.meta.filename)),format:sha(fs.readFileSync(new URL('./index-format.mjs',import.meta.url))),notices:catalogue.packs.map(p=>sha(fs.readFileSync(source+p.licencePath))),previews:'none'}))).slice(0,20),dataRoot='/wiki/data/'+version;
 assert.equal(catalogue.count,catalogue.packs.reduce((total,p)=>total+p.count,0));
 const files={},rows=[],lookup=Array.from({length:1024},()=>[]),postings=new Map(),formats={svg:[],png:[]},licences=new Map(),packs=[];
 const stopWords=new Set(['icon','icons','graphic','graphics','original','artwork','source']);const rowSize=256;
