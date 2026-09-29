@@ -67,7 +67,7 @@ The mirror checks SHA-256 and byte counts, uses four concurrent requests and ref
 
 ## Host your own interface
 
-`service.mjs` exports `freeAssetsRoute(request, assetsBinding, config)`. The assets binding implements `fetch(Request)` and serves the mirrored catalogue, generated dataset, and browser modules. Config contains `manifestPath`, `manifestBytes`, `manifestSha256`, and `repository`. The service supports GET, HEAD and CORS OPTIONS, server-rendered wiki pages and a documented API. Host `app.mjs`, `cards.mjs`, `sdk.mjs`, `library.css` and `vendor/fflate.mjs` under `/wiki/`. Adjust the canonical origin and API URLs for your own domain. Source sitemap files use at most 45,000 asset URLs each.
+`service.mjs` exports `freeAssetsRoute(request, assetsBinding, config)`. The assets binding implements `fetch(Request)` and serves the mirrored catalogue, generated dataset, and browser modules. Config contains `manifestPath`, `manifestBytes`, `manifestSha256`, and `repository`. The service supports GET, HEAD and CORS OPTIONS, server-rendered wiki pages and a documented API. Under `/wiki/`, serve `app.mjs` as `app-collections-20260929-v2.mjs` and `library.css` as `library-collections-20260929.css`, alongside `cards.mjs`, `sdk.mjs` and `vendor/fflate.mjs`. Keep these versioned paths in `pages.mjs` aligned with your deployed files so cached code and new HTML cannot drift. Adjust the canonical origin and API URLs for your own domain. Source sitemap files use at most 45,000 asset URLs each.
 
 To render the root and first pack pages from an existing asset host directory:
 
