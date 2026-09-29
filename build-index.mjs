@@ -1,0 +1,31 @@
+/** Build immutable bounded API indexes; read only the verified public gateway. */
+import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';import assert from 'node:assert/strict';
+import {words,shard,hex} from './index-format.mjs';
+const root=process.cwd(),source=path.resolve(process.argv[2]||'download'),out=path.resolve(process.argv[3]||'build');
+assert.equal(fs.existsSync(out),false);fs.mkdirSync(out,{recursive:true});
+const sha=bytes=>createHash('sha256').update(bytes).digest('hex'),manifestBytes=fs.readFileSync(source+'/icon-catalogue/manifest.json'),catalogue=JSON.parse(manifestBytes),catalogueSha256=sha(manifestBytes),version='v1-'+catalogueSha256.slice(0,20),dataRoot='/wiki/data/'+version;
+assert.equal(catalogue.count,catalogue.packs.reduce((total,p)=>total+p.count,0));
+const files={},rows=[],lookup=Array.from({length:1024},()=>[]),postings=new Map(),formats={svg:[],png:[]},licences=new Map(),packs=[];
+const stopWords=new Set(['icon','icons','graphic','graphics','original','artwork','source']);const rowSize=256;
+const previewManifest={items:[]};
+const previewRows=Array.isArray(previewManifest)?previewManifest:(previewManifest.items||[]);const previews=new Map(previewRows.map(s=>[s.id,s.previewPath||s.path]));
+function write(relative,value){const bytes=Buffer.from(typeof value==='string'?value:JSON.stringify(value));const target=path.join(out,'public',dataRoot,relative);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,bytes);files[relative]={path:dataRoot+'/'+relative,bytes:bytes.length,sha256:sha(bytes)};}
+let ordinal=0;for(const p of catalogue.packs){const raw=fs.readFileSync(source+p.catalogPath);assert.equal(sha(raw),p.catalogSha256);const c=JSON.parse(raw),first=ordinal;assert.equal(c.entries.length,p.count);
+ for(const [name,aliases,categories,rasterize,bundleIndex]of c.entries){const id=p.prefix+':'+name,sourceRecord=c.artworkSources?.[name],term=c.artworkTerms?.[name],bundle=c.bundles[bundleIndex];assert.ok(bundle);const nativePng=bundle.nativeAtlas!==undefined,format=nativePng?'png':'svg',license=term?.license||p.license;
+  const record={id,name,label:name.replaceAll('-',' ').replace(/^./,char=>char.toUpperCase()),pack:p.prefix,categories:categories.map(i=>c.categories[i]),aliases,format,editable:rasterize?'image':'vector',license:license.spdx,bundle:{path:bundle.path,sha256:bundle.sha256,bytes:bundle.bytes},...(term?{terms:term}:{}),...(sourceRecord?{source:{file:sourceRecord.file,sha256:sourceRecord.sourceSha256,svgSha256:sourceRecord.svgSha256,width:sourceRecord.sourceWidth,height:sourceRecord.sourceHeight,pixelated:sourceRecord.pixelated===true,layout:sourceRecord.sourceLayout===true}}:{}),...(previews.get(id)?{preview:previews.get(id)}:{})};
+  rows.push(record);lookup[shard(id,1024)].push([id,ordinal]);formats[format].push(ordinal);if(!licences.has(license.spdx))licences.set(license.spdx,[]);licences.get(license.spdx).push(ordinal);
+  for(const token of words([name,aliases,...record.categories,p.name,p.prefix,p.author.name,license.spdx].join(' '))){if(stopWords.has(token))continue;if(!postings.has(token))postings.set(token,[]);postings.get(token).push(ordinal);}ordinal++;
+ }
+ packs.push({...p,first,count:ordinal-first,source:c.source||p.author.url,licenceSha256:sha(fs.readFileSync(source+p.licencePath))});console.log(JSON.stringify({pack:p.prefix,indexed:ordinal}));
+}
+assert.equal(ordinal,catalogue.count);for(let i=0;i<rows.length;i+=rowSize)write('rows/'+hex(i/rowSize)+'.json',rows.slice(i,i+rowSize));
+for(let i=0;i<lookup.length;i++)write('lookup/'+hex(i)+'.json',lookup[i]);
+const wordShards=Array.from({length:256},()=>Object.create(null));for(const[token,ids]of postings)wordShards[shard(token)][token]=ids;for(let i=0;i<256;i++)write('words/'+hex(i)+'.json',wordShards[i]);
+write('formats.json',formats);write('licenses.json',Object.fromEntries(licences));
+const dataset={schema:'shirtlab.assets.v1',version,catalogueSha256,count:ordinal,packCount:packs.length,rowSize,wordShards:256,lookupShards:1024,search:{mode:'all-words',maximumQueryLength:160,maximumWords:8,stopWords:[...stopWords],pluralForms:true},packs,licenses:[...licences.keys()].sort(),formats:['svg','png'],files};
+const datasetBytes=Buffer.from(JSON.stringify(dataset)),manifestPath=dataRoot+'/manifest.json',target=path.join(out,'public',manifestPath);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,datasetBytes);
+const sitemaps=path.join(out,'public/wiki');fs.mkdirSync(sitemaps,{recursive:true});const assetPath=r=>'/wiki/'+r.pack+'/'+r.name+'/';const loc=p=>'<url><loc>https://shirtlab.lol'+p+'</loc></url>';
+const sitemapFiles=[];for(let i=0;i<rows.length;i+=45000){const name='sitemaps-assets-'+String(i/45000+1).padStart(2,'0')+'.xml';fs.writeFileSync(path.join(sitemaps,name),'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+rows.slice(i,i+45000).map(r=>loc(assetPath(r))).join('')+'</urlset>');sitemapFiles.push('/wiki/'+name);}
+fs.writeFileSync(path.join(sitemaps,'sitemaps-packs.xml'),'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+['/wiki/','/wiki/packs/','/wiki/api/',...packs.map(p=>'/wiki/packs/'+p.prefix+'/')].map(loc).join('')+'</urlset>');sitemapFiles.push('/wiki/sitemaps-packs.xml');
+fs.writeFileSync(path.join(out,'public/wiki/sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+sitemapFiles.map(p=>'<sitemap><loc>https://shirtlab.lol'+p+'</loc></sitemap>').join('')+'</sitemapindex>');
+const report={createdAt:new Date().toISOString(),version,catalogueSha256,count:ordinal,packCount:packs.length,rowSize,manifestPath,manifestBytes:datasetBytes.length,manifestSha256:sha(datasetBytes),indexFiles:Object.keys(files).length,tokenCount:postings.size,maximumIndexFileBytes:Math.max(...Object.values(files).map(f=>f.bytes)),sitemapFiles:sitemapFiles.length,sitemapAssetUrls:rows.length,source};fs.writeFileSync(out+'/preparation.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

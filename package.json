@@ -1,0 +1,10 @@
+{
+  "name": "@shirtlab/assets",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Open source search, downloads and portable collections for the Shirt Lab asset library",
+  "license": "MIT",
+  "exports": "./sdk.mjs",
+  "scripts": { "test": "node --test test/*.test.mjs" },
+  "engines": { "node": ">=20" }
+}
