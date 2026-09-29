@@ -1,5 +1,7 @@
 # RapidAPI provider package
 
+The [Shirt Lab Free Icons & Game Assets listing](https://rapidapi.com/lfbuildersmanager/api/shirt-lab-free-icons-game-assets) is public. Its overview links to the Wiki, API documentation and shirt designer. The $0 BASIC plan includes the request quotas below; RapidAPI platform bandwidth fees are separate.
+
 Import `openapi.json` into a private API project. It targets OpenAPI 3.0.3 while preserving the public origin contract. Run `node rapidapi/build-openapi.mjs` to regenerate it when the origin specification changes.
 
 Use `listing.json` for provider fields, `overview.md` for the long description and `docs.md` for the About/readme. The current Shirt Lab logo is [icon-192.png](https://shirtlab.lol/icon-192.png), within the Hub's 500 × 500 size limit.

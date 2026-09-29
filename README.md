@@ -30,7 +30,7 @@ The [RapidAPI integration package](rapidapi/) includes an OpenAPI 3.0.3 import, 
 
 ## Collections
 
-The wiki stores named collections in browser local storage. Export JSON for portability:
+Save an asset with the bookmark on its preview. A green check and on-screen confirmation show the active collection; open View collection to download or export it. Named collections stay in browser local storage and sync between open Wiki tabs. When storage is unavailable, saving still works for the session and JSON export remains available. Export JSON for portability:
 
 ```json
 {
@@ -67,7 +67,7 @@ The mirror checks SHA-256 and byte counts, uses four concurrent requests and ref
 
 ## Host your own interface
 
-`service.mjs` exports `freeAssetsRoute(request, assetsBinding, config)`. The assets binding implements `fetch(Request)` and serves the mirrored catalogue, generated dataset, and browser modules. Config contains `manifestPath`, `manifestBytes`, `manifestSha256`, and `repository`. The service supports GET, HEAD and CORS OPTIONS, server-rendered wiki pages and a documented API. Host `app.mjs`, `sdk.mjs`, `library.css` and `vendor/fflate.mjs` under `/wiki/`. Adjust the canonical origin and API URLs for your own domain. Source sitemap files use at most 45,000 asset URLs each.
+`service.mjs` exports `freeAssetsRoute(request, assetsBinding, config)`. The assets binding implements `fetch(Request)` and serves the mirrored catalogue, generated dataset, and browser modules. Config contains `manifestPath`, `manifestBytes`, `manifestSha256`, and `repository`. The service supports GET, HEAD and CORS OPTIONS, server-rendered wiki pages and a documented API. Host `app.mjs`, `cards.mjs`, `sdk.mjs`, `library.css` and `vendor/fflate.mjs` under `/wiki/`. Adjust the canonical origin and API URLs for your own domain. Source sitemap files use at most 45,000 asset URLs each.
 
 To render the root and first pack pages from an existing asset host directory:
 

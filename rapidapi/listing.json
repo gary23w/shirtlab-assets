@@ -20,5 +20,6 @@
   "termsOfUse": "API access is free. Each asset retains its original creator licence. Check license, licenseUrl and any per-asset terms before reuse; preserve required attribution. The SDK and original catalogue tooling are MIT-licensed; this does not relicense artwork. RapidAPI gateway limits and its separate platform bandwidth fees apply; direct public origin access remains free.",
   "gatewayHost": "shirt-lab-free-icons-game-assets.p.rapidapi.com",
   "listingUrl": "https://rapidapi.com/lfbuildersmanager/api/shirt-lab-free-icons-game-assets",
-  "publicationStatus": "private-draft"
+  "publicationStatus": "public",
+  "publicationVerifiedAt": "2026-09-29T14:11:25.394Z"
 }
